@@ -1,13 +1,10 @@
 package com.sparta.post.service;
 
-import com.sparta.post.dto.LoginRequestDto;
 import com.sparta.post.dto.SignupRequestDto;
 import com.sparta.post.entity.Message;
 import com.sparta.post.entity.User;
 import com.sparta.post.entity.UserRoleEnum;
-import com.sparta.post.jwt.JwtUtil;
 import com.sparta.post.repository.UserRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +19,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
 
     // ADMIN_TOKEN
     private final String ADMIN_TOKEN = "AAABnvxRVklrnYxKZ0aHgTBcXukeZygoC";
@@ -54,34 +50,5 @@ public class UserService {
         userRepository.save(user);
 
         return new ResponseEntity<>(msg, null, HttpStatus.OK);
-    }
-
-    public ResponseEntity<Message> login(LoginRequestDto requestDto, HttpServletResponse res) {
-
-        Message msg = new Message(200, "로그인 성공");
-
-        String username = requestDto.getUsername();
-        String password = requestDto.getPassword();
-
-        // 사용자 확인
-        Optional<User> checkUsername = userRepository.findByUsername(username);
-        User user;
-        if(checkUsername.isPresent()){
-            user = checkUsername.get();
-        } else{
-            return new ResponseEntity<>(new Message(400, "회원을 찾을 수 없습니다."), null, HttpStatus.BAD_REQUEST);
-        }
-
-        // 비밀번호 확인 check 필요
-        if(!passwordEncoder.matches(password, user.getPassword()))
-            return new ResponseEntity<>(new Message(400, "비밀번호가 일치하지 않습니다."), null, HttpStatus.BAD_REQUEST);
-
-        // 인증이 완료후 JWT 생성및 쿠키에 저장후 Response 객체에 추가
-        // 구현후 객체 주입 필요
-        String token = jwtUtil.createToken(user.getUsername(), user.getRole());
-        jwtUtil.addJwtToCookie(token, res);
-
-        return new ResponseEntity<>(msg, null, HttpStatus.OK);
-
     }
 }

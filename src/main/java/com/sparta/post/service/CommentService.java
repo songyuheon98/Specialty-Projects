@@ -4,10 +4,10 @@ import com.sparta.post.dto.CommentRequestDto;
 import com.sparta.post.dto.CommentResponseDto;
 import com.sparta.post.entity.*;
 import com.sparta.post.jwt.JwtUtil;
+import com.sparta.post.jwt.SecurityUtil;
 import com.sparta.post.repository.CommentRepository;
 import com.sparta.post.repository.PostRepository;
 import com.sparta.post.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +26,8 @@ public class CommentService {
     private final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createComment(CommentRequestDto requestDto, String tokenValue) {
-        String token = jwtUtil.substringToken(tokenValue);
-        if(!jwtUtil.validateToken(token)){
-            Message msg = new Message(400, "토큰이 유효하지 않습니다.");
-            return new ResponseEntity<>(msg, null, HttpStatus.BAD_REQUEST);
-        }
-        // DB에 해당 PostId 확인
-        findPost(requestDto.getPostId());
-        // username 가져오기
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        String username = info.getSubject();
+        User principal = SecurityUtil.getPrincipal().get();
+        String username = principal.getUsername();
         //RequestDto -> Entity
         Comment comment = new Comment(requestDto, username);
         //DB 저장
@@ -53,22 +45,13 @@ public class CommentService {
 
     @Transactional
     public ResponseEntity<?> updateComment(Long id, CommentRequestDto requestDto, String tokenValue) {
-
-        // JWT 토큰 substring
-        String token = jwtUtil.substringToken(tokenValue);
-
-        // 토큰 검증
-        if(!jwtUtil.validateToken(token)){
-            Message msg = new Message(400, "토큰이 유효하지 않습니다.");
-            return new ResponseEntity<>(msg, null, HttpStatus.BAD_REQUEST);
-        }
+        User principal = SecurityUtil.getPrincipal().get();
 
         // 해당 유저의 댓굴 id 값이 DB 에 존재하는지 확인
         Optional<Comment> checkComment = commentRepository.findById(id);
         Comment comment;
 
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        String username = info.getSubject();
+        String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(()->
                 new IllegalArgumentException("토큰이 이상합니다.")
@@ -97,21 +80,13 @@ public class CommentService {
 
         Message msg = new Message(200, "댓글 삭제 성공");
 
-        // JWT 토큰 substring
-        String token = jwtUtil.substringToken(tokenValue);
-
-        // 토큰 검증
-        if (!jwtUtil.validateToken(token)) {
-            msg = new Message(400, "토큰이 유효하지 않습니다.");
-            return new ResponseEntity<>(msg, null, HttpStatus.BAD_REQUEST);
-        }
+        User principal = SecurityUtil.getPrincipal().get();
 
         // 해당 유저의 댓굴 id 값이 DB 에 존재하는지 확인
         Optional<Comment> checkComment = commentRepository.findById(id);
         Comment comment;
 
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        String username = info.getSubject();
+        String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(()->
                 new IllegalArgumentException("토큰이 이상합니다.")

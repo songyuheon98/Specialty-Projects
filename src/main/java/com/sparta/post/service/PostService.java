@@ -1,7 +1,5 @@
 package com.sparta.post.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mysql.cj.log.Log;
 import com.sparta.post.dto.PostRequestDto;
 import com.sparta.post.dto.PostResponseDto;
 import com.sparta.post.dto.PostResponseListDto;
@@ -10,13 +8,11 @@ import com.sparta.post.entity.Post;
 import com.sparta.post.entity.User;
 import com.sparta.post.entity.UserRoleEnum;
 import com.sparta.post.jwt.JwtUtil;
+import com.sparta.post.jwt.SecurityUtil;
 import com.sparta.post.repository.CommentRepository;
 import com.sparta.post.repository.PostRepository;
 import com.sparta.post.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,16 +32,8 @@ public class PostService {
     private final JwtUtil jwtUtil;
 
     public ResponseEntity<?>  createPost(PostRequestDto requestDto, String tokenValue) {
-        // JWT 토큰 substring
-        String token = jwtUtil.substringToken(tokenValue);
-        // 토큰 검증
-        if(!jwtUtil.validateToken(token)){
-            Message msg = new Message(400, "토큰이 유효하지 않습니다.");
-            return new ResponseEntity<>(msg, null, HttpStatus.BAD_REQUEST);
-        }
-        //username 가져오기
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        String username = info.getSubject();
+        User principal = SecurityUtil.getPrincipal().get();
+        String username = principal.getUsername();
 
         //RequestDto -> Entity
         Post post = new Post(requestDto,username);
@@ -80,23 +68,11 @@ public class PostService {
     }
     @Transactional //변경 감지(Dirty Checking), 부모메서드인 updatePost
     public ResponseEntity<?> updatePost(Long id, PostRequestDto requestDto, String tokenValue){
-
-        // JWT 토큰 substring
-        String token = jwtUtil.substringToken(tokenValue);
-
-        // 토큰 검증
-        if(!jwtUtil.validateToken(token)){
-            Message msg = new Message(400, "토큰이 유효하지 않습니다.");
-            return new ResponseEntity<>(msg, null, HttpStatus.BAD_REQUEST);
-        }
+        User principal = SecurityUtil.getPrincipal().get();
 
         // 해당 post DB에 존재하는지 확인 수정필요
         Post post = findPost(id);
-
-        // 해당 사용자(username)가 작성한 게시글인지 확인
-        // setSubject(username)
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        String username = info.getSubject();
+        String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("토큰이 이상합니다.")
@@ -119,21 +95,14 @@ public class PostService {
 
         Message msg = new Message(200, "게시글 삭제 성공");
 
-        // JWT 토큰 substring
-        String token = jwtUtil.substringToken(tokenValue);
-
-        // 토큰 검증
-        if(!jwtUtil.validateToken(token)){
-            return new ResponseEntity<>(new Message(400, "토큰이 유효하지 않습니다."), null, HttpStatus.BAD_REQUEST);
-        }
+        User principal = SecurityUtil.getPrincipal().get();
 
         // 해당 post DB에 존재하는지 확인
         Post post = findPost(id);
 
         // 해당 사용자(username)가 작성한 게시글인지 확인
         // setSubject(username)
-        Claims info = jwtUtil.getUserInfoFromToken(token);
-        String username = info.getSubject();
+        String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("토큰이 이상합니다.")
