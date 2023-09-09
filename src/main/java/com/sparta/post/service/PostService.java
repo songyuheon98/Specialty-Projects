@@ -31,7 +31,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final JwtUtil jwtUtil;
 
-    public ResponseEntity<?>  createPost(PostRequestDto requestDto, String tokenValue) {
+    public ResponseEntity<?> createPost(PostRequestDto requestDto, String tokenValue) {
         User principal = SecurityUtil.getPrincipal().get();
         String username = principal.getUsername();
 

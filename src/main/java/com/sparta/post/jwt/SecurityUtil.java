@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public class SecurityUtil {
     public static Optional<User> getPrincipal() {
+        // of() 인자로서 null 값을 받지 않는다.
+        // ofNullable() null 값을 허용한다.
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)

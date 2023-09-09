@@ -23,7 +23,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createComment(CommentRequestDto requestDto, String tokenValue) {
         User principal = SecurityUtil.getPrincipal().get();
