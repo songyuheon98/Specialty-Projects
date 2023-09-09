@@ -55,6 +55,7 @@ public class UserService {
         User user = new User(username, password, role);
         userRepository.save(user);
 
+
         return new ResponseEntity<>(msg, null, HttpStatus.OK);
     }
     public ResponseEntity<Message> escape(){

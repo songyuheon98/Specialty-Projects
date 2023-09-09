@@ -31,13 +31,19 @@ public class PostService {
     //멤버 변수 선언
     private final PostRepository postRepository;
 
+    @Transactional
     public ResponseEntity<?> createPost(PostRequestDto requestDto, String tokenValue) {
         User principal = SecurityUtil.getPrincipal().get();
         String username = principal.getUsername();
 
+        User user = userRepository.findByUsername(username).orElseThrow(() ->
+                new UserNotFoundException("회원을 찾을 수 없습니다.")
+        );
+
         //RequestDto -> Entity
         Post post = new Post(requestDto,username);
 
+        user.addPostList(post);
         //DB 저장
         Post savePost = postRepository.save(post);
 
@@ -45,7 +51,7 @@ public class PostService {
         return new ResponseEntity<>(new PostResponseDto(savePost),null, HttpStatus.OK);
     }
 
-    @Transactional(readOnly = true)
+
     public PostResponseListDto getPosts(){
         // comment : post  -> N : 1
         // commentList -> postId 기준으로 불러온다.

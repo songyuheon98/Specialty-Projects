@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +43,9 @@ public class User {
         this.role = role;
     }
 
-//    public void addPostList(Post post){
-//        this.posts.add(post);
-//        post.setUser(this);
-//    }
+    public void addPostList(Post post){
+        this.posts.add(post);
+        post.setUser(this);
+    }
 }
 

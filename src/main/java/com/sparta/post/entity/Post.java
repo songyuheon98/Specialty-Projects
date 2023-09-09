@@ -37,7 +37,7 @@ public class Post extends Timestamped{
     @JsonBackReference
     private List<Comment> comments = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
