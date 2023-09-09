@@ -7,12 +7,13 @@ import com.sparta.post.entity.Message;
 import com.sparta.post.entity.Post;
 import com.sparta.post.entity.User;
 import com.sparta.post.entity.UserRoleEnum;
-import com.sparta.post.jwt.JwtUtil;
+import com.sparta.post.exception.TokenNotValidException;
+import com.sparta.post.exception.UserNotFoundException;
 import com.sparta.post.jwt.SecurityUtil;
-import com.sparta.post.repository.CommentRepository;
 import com.sparta.post.repository.PostRepository;
 import com.sparta.post.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PostService {
 
     private final UserRepository userRepository;
     //멤버 변수 선언
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
-    private final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createPost(PostRequestDto requestDto, String tokenValue) {
         User principal = SecurityUtil.getPrincipal().get();
@@ -63,7 +63,7 @@ public class PostService {
     public PostResponseDto getPost(Long id) {
         // id 로 조회
         Post post = findPost(id);
-        // 새로운 Dto 로 수정할 부분 최소화
+
         return new PostResponseDto(post);
     }
     @Transactional //변경 감지(Dirty Checking), 부모메서드인 updatePost
@@ -75,7 +75,7 @@ public class PostService {
         String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(() ->
-                new IllegalArgumentException("토큰이 이상합니다.")
+                new UserNotFoundException("회원을 찾을 수 없습니다.")
         );
 
         if(user.getRole().equals(UserRoleEnum.ADMIN)){
@@ -107,11 +107,10 @@ public class PostService {
         User user = userRepository.findByUsername(username).orElseThrow(() ->
                 new IllegalArgumentException("토큰이 이상합니다.")
         );
-        System.out.println("HEHEHEHEHEHEHEHEH");
         if(user.getRole().equals(UserRoleEnum.ADMIN)){
             System.out.println("운영자가 로그인하였습니다.");
         }else if(!username.equals(post.getUsername())){
-            throw new IllegalArgumentException("사용자 정보가 없습니다.");
+            throw new UserNotFoundException("회원을 찾을 수 없습니다.");
         }
 
         //post 삭제
@@ -123,7 +122,7 @@ public class PostService {
     private Post findPost(Long id){
         //findById -> Optional type -> Null Check
         return postRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("선택한 메모는 존재하지 않습니다.")
+                new IllegalArgumentException("선택한 게시글은 존재하지 않습니다.")
         );
     }
 

@@ -3,7 +3,8 @@ package com.sparta.post.service;
 import com.sparta.post.dto.CommentRequestDto;
 import com.sparta.post.dto.CommentResponseDto;
 import com.sparta.post.entity.*;
-import com.sparta.post.jwt.JwtUtil;
+import com.sparta.post.exception.UserNotFoundException;
+import com.sparta.post.exception.WriterNotMatchException;
 import com.sparta.post.jwt.SecurityUtil;
 import com.sparta.post.repository.CommentRepository;
 import com.sparta.post.repository.PostRepository;
@@ -37,6 +38,7 @@ public class CommentService {
         );
         post.addCommentList(comment);
         System.out.println("게시글에 댓글이 추가되었습니다.");
+
         Post savePost = postRepository.save(post);
         //Entity -> ResponseDto
         return new ResponseEntity<>(new CommentResponseDto(saveComment),null, HttpStatus.OK );
@@ -53,7 +55,7 @@ public class CommentService {
         String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(()->
-                new IllegalArgumentException("토큰이 이상합니다.")
+                new UserNotFoundException("회원을 찾을 수 없습니다.")
         );
 
         if (checkComment.isPresent()) {
@@ -77,7 +79,7 @@ public class CommentService {
 
     public ResponseEntity<?> deleteComment(Long id, String tokenValue) {
 
-        Message msg = new Message(200, "댓글 삭제 성공");
+        Message msg = new Message("댓글 삭제 성공", 200);
 
         User principal = SecurityUtil.getPrincipal().get();
 
@@ -88,7 +90,7 @@ public class CommentService {
         String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(()->
-                new IllegalArgumentException("토큰이 이상합니다.")
+                new UserNotFoundException("회원을 찾을 수 없습니다.")
         );
 
         if (checkComment.isPresent()) {

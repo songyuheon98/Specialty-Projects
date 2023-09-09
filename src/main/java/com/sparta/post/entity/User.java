@@ -1,10 +1,14 @@
 package com.sparta.post.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,10 +32,19 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private UserRoleEnum role;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonBackReference
+    private List<Post> posts = new ArrayList<>();
+
     public User(String username, String password, UserRoleEnum role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
+
+//    public void addPostList(Post post){
+//        this.posts.add(post);
+//        post.setUser(this);
+//    }
 }
 

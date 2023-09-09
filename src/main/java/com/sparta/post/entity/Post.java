@@ -30,6 +30,9 @@ public class Post extends Timestamped{
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "likecount", nullable = false)
+    private Long likeCount = 0L;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     @JsonBackReference
     private List<Comment> comments = new ArrayList<>();

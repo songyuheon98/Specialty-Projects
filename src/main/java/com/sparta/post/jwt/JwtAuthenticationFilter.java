@@ -3,6 +3,7 @@ package com.sparta.post.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.post.dto.LoginRequestDto;
 import com.sparta.post.entity.UserRoleEnum;
+import com.sparta.post.exception.UserNotFoundException;
 import com.sparta.post.security.UserDetailsImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -66,5 +67,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
         response.setStatus(401);
+        // 추가
+        throw new UserNotFoundException("회원을 찾을 수 없습니다.");
     }
 }

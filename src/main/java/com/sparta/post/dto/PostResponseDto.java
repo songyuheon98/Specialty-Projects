@@ -18,9 +18,9 @@ public class PostResponseDto{
     private String title;
     private String username;
     private String content;
+    private Long likeCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-  //  private String comments;
     private List<ForResponseComment> comments = new ArrayList<>();
 //    private List<CommentResponseDto> commentResponseDto = new ArrayList<>();
 
@@ -38,6 +38,7 @@ public class PostResponseDto{
         this.title = post.getTitle();
         this.username = post.getUsername();
         this.content = post.getContent();
+        this.likeCount = post.getLikeCount();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
         StringBuilder sb = new StringBuilder();
