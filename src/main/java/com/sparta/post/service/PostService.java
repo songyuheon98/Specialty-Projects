@@ -79,9 +79,9 @@ public class PostService {
         );
 
         if(user.getRole().equals(UserRoleEnum.ADMIN)){
-            System.out.println("운영자가 로그인하였습니다.");
+            log.info("관리자가 로그인 하였습니다.");
         }else if(!username.equals(post.getUsername())){
-            throw new IllegalArgumentException("사용자 정보가 없습니다.");
+            throw new UserNotFoundException("작성자만 삭제/수정할 수 있습니다.");
         }
 
         // post 내용 수정
@@ -93,7 +93,7 @@ public class PostService {
 
     public ResponseEntity<Message> deletePost(Long id, String tokenValue){
 
-        Message msg = new Message(200, "게시글 삭제 성공");
+        Message msg = new Message("게시글 삭제 성공",200);
 
         User principal = SecurityUtil.getPrincipal().get();
 
@@ -105,7 +105,7 @@ public class PostService {
         String username = principal.getUsername();
 
         User user = userRepository.findByUsername(username).orElseThrow(() ->
-                new IllegalArgumentException("토큰이 이상합니다.")
+                new TokenNotValidException("토큰이 유효하지 않습니다.")
         );
         if(user.getRole().equals(UserRoleEnum.ADMIN)){
             System.out.println("운영자가 로그인하였습니다.");

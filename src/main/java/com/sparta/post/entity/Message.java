@@ -8,7 +8,7 @@ public class Message {
     private int statusCode;
     private String msg;
 
-    public Message(int statusCode, String msg) {
+    public Message(String msg,int statusCode) {
         this.statusCode = statusCode;
         this.msg = msg;
     }

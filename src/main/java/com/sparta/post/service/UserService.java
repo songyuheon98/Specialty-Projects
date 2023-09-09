@@ -3,6 +3,7 @@ package com.sparta.post.service;
 import com.sparta.post.dto.LoginRequestDto;
 import com.sparta.post.dto.SignupRequestDto;
 import com.sparta.post.entity.Message;
+import com.sparta.post.entity.Post;
 import com.sparta.post.entity.User;
 import com.sparta.post.entity.UserRoleEnum;
 import com.sparta.post.exception.DuplicateUsernameException;
@@ -30,7 +31,7 @@ public class UserService {
 
     public ResponseEntity<Message> signup(SignupRequestDto requestDto) {
 
-        Message msg = new Message(200, "회원가입 성공");
+        Message msg = new Message("회원가입 성공",200);
 
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
@@ -38,7 +39,7 @@ public class UserService {
         // username 중복 확인
         Optional<User> checkUsername = userRepository.findByUsername(username);
         if(checkUsername.isPresent()){
-            return new ResponseEntity<>(new Message(400, "중복된 username 입니다."), null, HttpStatus.BAD_REQUEST);
+            throw new DuplicateUsernameException("중복된 username 입니다.");
         }
 
         // 사용자 ROLE 확인
@@ -54,6 +55,18 @@ public class UserService {
         User user = new User(username, password, role);
         userRepository.save(user);
 
+        return new ResponseEntity<>(msg, null, HttpStatus.OK);
+    }
+    public ResponseEntity<Message> escape(){
+
+        String username = SecurityUtil.getPrincipal().get().getUsername();
+
+        userRepository.delete(userRepository.findByUsername(username).orElse(null));
+        Message msg = new Message("회원 삭제 성공",200);
+
+        // 해당 사용자(username)가 작성한 게시글인지 확인
+        // setSubject(username)
+        //post 삭제
         return new ResponseEntity<>(msg, null, HttpStatus.OK);
     }
 }

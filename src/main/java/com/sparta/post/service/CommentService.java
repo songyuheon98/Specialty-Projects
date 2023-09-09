@@ -34,7 +34,7 @@ public class CommentService {
         Comment saveComment = commentRepository.save(comment);
 
         Post post = postRepository.findById(requestDto.getPostId()).orElseThrow(() ->
-                new IllegalArgumentException("토큰이 이상합니다.")
+                new IllegalArgumentException("선택한 게시글은 존재하지 않습니다.")
         );
         post.addCommentList(comment);
         System.out.println("게시글에 댓글이 추가되었습니다.");
@@ -61,13 +61,13 @@ public class CommentService {
         if (checkComment.isPresent()) {
             comment = checkComment.get();
         } else{
-            return new ResponseEntity<>(new Message(400, "comment란은 비워두면 안됩니다."), null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("comment란은 비워두면 안됩니다.",400), null, HttpStatus.BAD_REQUEST);
         }
         System.out.println(user.getRole());
         if(user.getRole().equals(UserRoleEnum.ADMIN)){
 
         } else if(!comment.getUsername().equals(user.getUsername()) ){
-            return new ResponseEntity<>(new Message(400, "작성자만 삭제/수정할 수 있습니다."), null, HttpStatus.BAD_REQUEST);
+            throw new WriterNotMatchException("작성자만 삭제/수정할 수 있습니다.");
         }
 
 
@@ -96,11 +96,11 @@ public class CommentService {
         if (checkComment.isPresent()) {
             comment = checkComment.get();
         } else {
-            return new ResponseEntity<>(new Message(400, "댓글 상태가 이상합니다."), null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message( "댓글 상태가 이상합니다.",400), null, HttpStatus.BAD_REQUEST);
         }
         if(user.getRole().equals(UserRoleEnum.ADMIN)){
         } else if(!comment.getUsername().equals(user.getUsername()) ){
-            return new ResponseEntity<>(new Message(400, "작성자만 삭제/수정할 수 있습니다."), null, HttpStatus.BAD_REQUEST);
+            throw new WriterNotMatchException("작성자만 삭제/수정할 수 있습니다.");
         }
         // comment 삭제
         commentRepository.delete(comment);

@@ -1,5 +1,6 @@
 package com.sparta.post.jwt;
 
+import com.sparta.post.exception.TokenNotValidException;
 import com.sparta.post.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -39,10 +40,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             tokenValue = jwtUtil.substringToken(tokenValue);
             log.info(tokenValue);
 
-            if (!jwtUtil.validateToken(tokenValue)) {
-                log.error("Token Error");
-                return;
-            }
+            if (!jwtUtil.validateToken(tokenValue))
+                throw new TokenNotValidException("토큰이 유효하지 않습니다.");
+
 
             Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
 

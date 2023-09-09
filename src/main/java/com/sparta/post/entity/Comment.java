@@ -24,6 +24,10 @@ public class Comment extends Timestamped {
     @Column(name = "username", nullable = false)
     private String username;
 
+    @Column(name = "likecount", nullable = false)
+    private Long likeCount= 0L;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
