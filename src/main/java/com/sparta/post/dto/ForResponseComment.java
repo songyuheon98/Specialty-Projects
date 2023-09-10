@@ -2,6 +2,7 @@ package com.sparta.post.dto;
 
 import com.sparta.post.entity.Comment;
 import com.sparta.post.entity.Post;
+import com.sparta.post.entity.Reply;
 import jakarta.persistence.*;
 import lombok.Getter;
 

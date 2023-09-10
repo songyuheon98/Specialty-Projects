@@ -17,6 +17,6 @@ public class SecurityUtil {
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getPrincipal)
                 .map(UserDetailsImpl.class::cast)
-                .map(UserDetailsImpl::getUser);
+                .map(UserDetailsImpl::getUser); // 형태를 바꾼다. 생성자가 존재할것이다.
     }
 }

@@ -108,10 +108,10 @@ public class CommentService {
         return new ResponseEntity<>(msg, null, HttpStatus.OK);
     }
 
-    private void findPost(Long id){
-        //findById -> Optional type -> Null Check
-        postRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("선택한 게시글은 존재하지 않습니다.")
-        );
-    }
+//    private void findPost(Long id){
+//        //findById -> Optional type -> Null Check
+//        postRepository.findById(id).orElseThrow(() ->
+//                new IllegalArgumentException("선택한 게시글은 존재하지 않습니다.")
+//        );
+//    }
 }

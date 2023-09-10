@@ -35,11 +35,11 @@ public class PostController {
         return postService.createPost(requestDto,tokenValue);
     }
 
-    @GetMapping("/posts")
-    public PostResponseListDto getPosts(){
-        PostResponseListDto dto = postService.getPosts();
-        System.out.println("hello");
-        return dto;
+    @GetMapping("/posts") // Slice
+    public List<PostResponseDto> getPosts(@RequestBody PageRequestDto pageRequestDto){
+        return postService.getPosts(pageRequestDto).getContent();
+//        Page<PostResponseDto> dto = postService.getPosts(pageRequestDto);
+//        return dto;
     }
 
     // @RequestBody -> Json 기반의 메시지를 사용하는 요청의 경우

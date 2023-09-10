@@ -54,13 +54,14 @@ public class PostService {
     public PostResponseListDto getPosts(){
         // comment : post  -> N : 1
         // commentList -> postId 기준으로 불러온다.
-        List<Post> postList = postRepository.findAllByOrderByCreatedAt();
-        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
-        for(Post post : postList){
-            PostResponseDto postRes = new PostResponseDto(post);
-            postResponseDtoList.add(postRes);
-        }
-        return new PostResponseListDto(postResponseDtoList);
+//        List<Post> postList = postRepository.findAllByOrderByCreatedAt();
+//        List<PostResponseDto> postResponseDtoList = new ArrayList<>();
+//
+//        for(Post post : postList){
+//            PostResponseDto postRes = new PostResponseDto(post);
+//            postResponseDtoList.add(postRes);
+//        }
+//        return new PostResponseListDto(postResponseDtoList);
         //return postRepository.findAllByOrderByCreatedAtDesc().stream().map(PostResponseDto::new).toList();
     }
 
