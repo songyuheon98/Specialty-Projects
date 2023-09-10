@@ -41,8 +41,10 @@ public class Post extends Timestamped{
     @JoinColumn(name = "user_id")
     private User user;
 
-
-
+    // Post : folder = n : 1
+    @ManyToOne
+    @JoinColumn(name = "folder_id")
+    private Folder folder;
 
     public Post(PostRequestDto requestDto, String username) {
         this.title = requestDto.getTitle();

@@ -44,8 +44,8 @@ public class PostController {
 
     // @RequestBody -> Json 기반의 메시지를 사용하는 요청의 경우
     @GetMapping("/post/{id}")
-    public PostResponseDto getPost(@PathVariable Long id) {
-        return postService.getPost(id);
+    public List<PostResponseDto> getPost(@PathVariable Long id, @RequestBody PageRequestDto pageRequestDto) {
+        return postService.getPost(id, pageRequestDto);
     }
 
     //@PathVariable uri -> id

@@ -37,6 +37,11 @@ public class User {
     @JsonBackReference
     private List<Post> posts = new ArrayList<>();
 
+    // folder : user = n : m
+    @OneToMany(mappedBy = "user")
+    @JsonBackReference
+    private List<MiddleTable> middleTableList = new ArrayList<>();
+
     public User(String username, String password, UserRoleEnum role) {
         this.username = username;
         this.password = password;

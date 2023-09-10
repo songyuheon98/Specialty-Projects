@@ -3,10 +3,7 @@ package com.sparta.post.service;
 import com.sparta.post.dto.PostRequestDto;
 import com.sparta.post.dto.PostResponseDto;
 import com.sparta.post.dto.PostResponseListDto;
-import com.sparta.post.entity.Message;
-import com.sparta.post.entity.Post;
-import com.sparta.post.entity.User;
-import com.sparta.post.entity.UserRoleEnum;
+import com.sparta.post.entity.*;
 import com.sparta.post.exception.TokenNotValidException;
 import com.sparta.post.exception.UserNotFoundException;
 import com.sparta.post.jwt.SecurityUtil;
@@ -19,8 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,6 +27,7 @@ public class PostService {
     private final UserRepository userRepository;
     //멤버 변수 선언
     private final PostRepository postRepository;
+    private final FolderRepository folderRepository;
 
     @Transactional
     public ResponseEntity<?> createPost(PostRequestDto requestDto, String tokenValue) {
@@ -40,9 +38,14 @@ public class PostService {
                 new UserNotFoundException("회원을 찾을 수 없습니다.")
         );
 
+
         //RequestDto -> Entity
         Post post = new Post(requestDto,username);
         user.addPostList(post);
+
+        //폴더 객체 저장
+        folderRepository.save(new Folder(post,requestDto.getFolderNumber()));
+
         //DB 저장
         Post savePost = postRepository.save(post);
 
@@ -66,11 +69,15 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponseDto getPost(Long id) {
-        // id 로 조회
-        Post post = findPost(id);
+    public List<PostResponseDto> getPost(Long folderNumber, PageRequestDto pageRequestDto) {
 
-        return new PostResponseDto(post);
+        return getPosts(pageRequestDto).stream() // Stream Page<PostResponseDto>
+                .filter(n->folderRepository.findByFolderNumber(folderNumber) // folder id에 해당하는 folder
+                        .getPosts() // postlist
+                        .stream().map(Post::getId).toList() // post id list
+                        .contains(n.getId())
+                ) // getposts -> post -> post id in( folder -> postlist -> post id)
+                .collect(Collectors.toList()); // List<PostResponseDto>
     }
     @Transactional //변경 감지(Dirty Checking), 부모메서드인 updatePost
     public ResponseEntity<?> updatePost(Long id, PostRequestDto requestDto, String tokenValue){
