@@ -1,5 +1,6 @@
 package com.sparta.post.service;
 
+import com.sparta.post.dto.PageRequestDto;
 import com.sparta.post.dto.PostRequestDto;
 import com.sparta.post.dto.PostResponseDto;
 import com.sparta.post.dto.PostResponseListDto;
@@ -7,10 +8,15 @@ import com.sparta.post.entity.*;
 import com.sparta.post.exception.TokenNotValidException;
 import com.sparta.post.exception.UserNotFoundException;
 import com.sparta.post.jwt.SecurityUtil;
+import com.sparta.post.repository.FolderRepository;
 import com.sparta.post.repository.PostRepository;
 import com.sparta.post.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -54,7 +60,22 @@ public class PostService {
     }
 
 
-    public PostResponseListDto getPosts(){
+    public Page<PostResponseDto> getPosts(PageRequestDto pageRequestDto){
+
+        // 페이징 처리
+        Sort.Direction direction = pageRequestDto.getIsAsc() ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, pageRequestDto.getSortBy());
+        Pageable pageable = PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize(), sort);
+
+        // 사용자 권한 가져와서 ADMIN 이면 전체 조회, USER 면 본인이 추가한 부분 조회
+//        UserRoleEnum userRoleEnum = user.getRole();
+
+        Page<Post> postList;
+        postList = postRepository.findAll(pageable);
+
+        return postList.map(PostResponseDto::new);
+
+
         // comment : post  -> N : 1
         // commentList -> postId 기준으로 불러온다.
 //        List<Post> postList = postRepository.findAllByOrderByCreatedAt();

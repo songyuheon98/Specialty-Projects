@@ -7,7 +7,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 @Getter
 public class ForResponseComment {
@@ -20,6 +22,7 @@ public class ForResponseComment {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Long likeCount;
+    private List<ReplyResponseDto> replys = new ArrayList<>();
 
     public ForResponseComment(Comment comment){
         this.id = comment.getId();
@@ -28,5 +31,13 @@ public class ForResponseComment {
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
         this.likeCount = comment.getLikeCount();
+
+        this.replys = comment.getReplys().stream()
+                .map(ReplyResponseDto::new).toList();
+
+//        for(Reply reply : comment.getReplys()){
+//            ReplyResponseDto rr = new ReplyResponseDto(reply);
+//            replys.add(rr);
+//        }
     }
 }

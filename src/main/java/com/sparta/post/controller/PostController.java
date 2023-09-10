@@ -1,18 +1,14 @@
 package com.sparta.post.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sparta.post.dto.PageRequestDto;
 import com.sparta.post.dto.PostRequestDto;
 import com.sparta.post.dto.PostResponseDto;
-import com.sparta.post.dto.PostResponseListDto;
 import com.sparta.post.entity.Message;
-import com.sparta.post.entity.Post;
 import com.sparta.post.jwt.JwtUtil;
 import com.sparta.post.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RestController

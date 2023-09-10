@@ -25,6 +25,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    @Transactional
     public ResponseEntity<?> createComment(CommentRequestDto requestDto, String tokenValue) {
         User principal = SecurityUtil.getPrincipal().get();
         String username = principal.getUsername();
@@ -39,7 +40,7 @@ public class CommentService {
         post.addCommentList(comment);
         System.out.println("게시글에 댓글이 추가되었습니다.");
 
-        Post savePost = postRepository.save(post);
+//        Post savePost = postRepository.save(post); // transaction이 없기에 save로 변경 사항 적용
         //Entity -> ResponseDto
         return new ResponseEntity<>(new CommentResponseDto(saveComment),null, HttpStatus.OK );
     }
